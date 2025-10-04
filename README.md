@@ -1,34 +1,57 @@
 # FlowOTP
 
-A minimalist Cloudflare Worker for generating TOTP (Time-based One-Time Password) tokens via HTTP.
+A secure Cloudflare Worker for generating TOTP (Time-based One-Time Password) tokens via HTTP.
 
 ## Usage
 
-- **Endpoint:**  
-  `/tools/flowotp/[secret]`
+### Configuration
 
-Send a GET request with your Base32-encoded TOTP secret.  
-Returns the current TOTP token as JSON.
+Add your TOTP secrets as environment variables in Cloudflare Workers:
+
+**Variable Format:** `OTP_SECRETS_{IDENTIFIER}`
+
+**Value Format:** `SERVICE_NAME=BASE32_SECRET,SERVICE_NAME2=BASE32_SECRET2,...`
 
 **Example:**
-```http
-GET https://daiquiri.dev/tools/flowotp/ABCDEF1234567890
 ```
-**Response:**
+OTP_SECRETS_ROIPUBLIC=GitHub=JBSWY3DPEHPK3PXP,AWS=ABCD1234EFGH5678,Google=MNOP9012QRST3456
+```
+
+### Endpoint
+
+- **URL Pattern:** `/{identifier}`
+- **Method:** `GET`
+
+**Example Request:**
+```bash
+curl https://2fa.daiquiri.dev/roipublic
+```
+
+**Response (JSON Lines format):**
 ```json
-{ "token": "123456" }
+{"service":"GitHub","token":"123456"}
+{"service":"AWS","token":"789012"}
+{"service":"Google","token":"345678"}
 ```
 
 ## Security
 
-- The `secret` must be at least 16 characters.
-- All logic runs within the Cloudflare Worker environment; secrets are never stored.
+- ✅ Secrets stored in encrypted environment variables (not exposed in URLs)
+- ✅ No secrets logged or stored on disk
+- ✅ All processing happens within Cloudflare Worker secure environment
+- ✅ Multiple services supported with named tokens
+
+## Setup
+
+1. Deploy to Cloudflare Workers
+2. Add `OTP_SECRETS` environment variable in Workers settings
+3. Access your endpoint to get all TOTP tokens
 
 ## Directory Structure
 
 ```
-[secret].js
-flowotp.js
+functions/
+  └── flowotp.js    # Main worker file
 README.md
 ```
 

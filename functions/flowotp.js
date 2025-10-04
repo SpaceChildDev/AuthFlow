@@ -1,23 +1,7 @@
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    // Route: /tools/flowotp/:secret or /:secret
-    // Remove /tools/flowotp/ prefix if present
-    let path = url.pathname;
-    if (path.startsWith("/tools/flowotp/")) {
-      path = path.replace("/tools/flowotp/", "");
-    } else if (path.startsWith("/")) {
-      path = path.slice(1);
-    }
-    const secret = path.split('/')[0]; // First segment is the parameter
-
-    // Basic validation
-    if (!secret || secret.length < 16) {
-      return new Response(JSON.stringify({ error: "Invalid token." }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" }
-      });
-    }
+    const path = url.pathname;
 
     // TOTP helper functions
     function base32toHex(base32) {
@@ -63,8 +47,55 @@ export default {
       return otp;
     }
 
-    const token = await generateTOTP(secret);
-    return new Response(JSON.stringify({ token }), {
+    // Extract identifier from path (e.g., /roipublic -> roipublic)
+    const identifier = path.startsWith('/') ? path.slice(1) : path;
+
+    if (!identifier) {
+      return new Response(JSON.stringify({ error: "No identifier provided" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
+    // Get secrets for this identifier from environment
+    // Expected format: OTP_SECRETS_ROIPUBLIC=GitHub=SECRET1,AWS=SECRET2
+    const envKey = `OTP_SECRETS_${identifier.toUpperCase()}`;
+    const secretsEnv = env[envKey] || "";
+
+    if (!secretsEnv) {
+      return new Response(JSON.stringify({ error: "No OTP secrets configured for this identifier" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
+    const secrets = {};
+    secretsEnv.split(',').forEach(pair => {
+      const [name, secret] = pair.split('=');
+      if (name && secret) {
+        secrets[name.trim()] = secret.trim();
+      }
+    });
+
+    if (Object.keys(secrets).length === 0) {
+      return new Response(JSON.stringify({ error: "Invalid OTP_SECRETS format" }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
+    // Generate tokens for all configured services
+    const tokens = [];
+    for (const [name, secret] of Object.entries(secrets)) {
+      try {
+        const token = await generateTOTP(secret);
+        tokens.push({ service: name, token });
+      } catch (error) {
+        tokens.push({ service: name, error: "Failed to generate token" });
+      }
+    }
+
+    return new Response(tokens.map(t => JSON.stringify(t)).join('\n'), {
       headers: { "Content-Type": "application/json" }
     });
   }
