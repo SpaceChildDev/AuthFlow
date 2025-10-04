@@ -47,56 +47,40 @@ export default {
       return otp;
     }
 
-    // Extract identifier from path (e.g., /roipublic -> roipublic)
-    const identifier = path.startsWith('/') ? path.slice(1) : path;
+    // Extract path segments (e.g., /roipublic/shopify-mcc)
+    const pathSegments = path.split('/').filter(s => s);
 
-    if (!identifier) {
-      return new Response(JSON.stringify({ error: "No identifier provided" }), {
+    if (pathSegments.length !== 2) {
+      return new Response(JSON.stringify({ error: "Invalid path. Use /{identifier}/{service}" }), {
         status: 400,
         headers: { "Content-Type": "application/json" }
       });
     }
 
-    // Get secrets for this identifier from environment
-    // Expected format: OTP_SECRETS_ROIPUBLIC=GitHub=SECRET1,AWS=SECRET2
-    const envKey = `OTP_SECRETS_${identifier.toUpperCase()}`;
-    const secretsEnv = env[envKey] || "";
+    const [identifier, service] = pathSegments;
 
-    if (!secretsEnv) {
-      return new Response(JSON.stringify({ error: "No OTP secrets configured for this identifier" }), {
+    // Build environment variable key: ROIPUBLIC_SHOPIFY_MCC
+    const envKey = `${identifier.toUpperCase()}_${service.toUpperCase().replace(/-/g, '_')}`;
+    const secret = env[envKey];
+
+    if (!secret) {
+      return new Response(JSON.stringify({ error: `No secret configured for ${envKey}` }), {
         status: 404,
         headers: { "Content-Type": "application/json" }
       });
     }
 
-    const secrets = {};
-    secretsEnv.split(',').forEach(pair => {
-      const [name, secret] = pair.split('=');
-      if (name && secret) {
-        secrets[name.trim()] = secret.trim();
-      }
-    });
-
-    if (Object.keys(secrets).length === 0) {
-      return new Response(JSON.stringify({ error: "Invalid OTP_SECRETS format" }), {
+    // Generate token
+    try {
+      const token = await generateTOTP(secret);
+      return new Response(JSON.stringify({ service, token }), {
+        headers: { "Content-Type": "application/json" }
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({ error: "Failed to generate token" }), {
         status: 500,
         headers: { "Content-Type": "application/json" }
       });
     }
-
-    // Generate tokens for all configured services
-    const tokens = [];
-    for (const [name, secret] of Object.entries(secrets)) {
-      try {
-        const token = await generateTOTP(secret);
-        tokens.push({ service: name, token });
-      } catch (error) {
-        tokens.push({ service: name, error: "Failed to generate token" });
-      }
-    }
-
-    return new Response(tokens.map(t => JSON.stringify(t)).join('\n'), {
-      headers: { "Content-Type": "application/json" }
-    });
   }
 };

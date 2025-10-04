@@ -6,32 +6,32 @@ A secure Cloudflare Worker for generating TOTP (Time-based One-Time Password) to
 
 ### Configuration
 
-Add your TOTP secrets as environment variables in Cloudflare Workers:
+Add your TOTP secrets as **encrypted environment variables** in Cloudflare Workers/Pages:
 
-**Variable Format:** `OTP_SECRETS_{IDENTIFIER}`
-
-**Value Format:** `SERVICE_NAME=BASE32_SECRET,SERVICE_NAME2=BASE32_SECRET2,...`
+**Variable Format:** `{IDENTIFIER}_{SERVICE}`
 
 **Example:**
 ```
-OTP_SECRETS_ROIPUBLIC=GitHub=JBSWY3DPEHPK3PXP,AWS=ABCD1234EFGH5678,Google=MNOP9012QRST3456
+ROIPUBLIC_SHOPIFY_MCC=JBSWY3DPEHPK3PXP
+ROIPUBLIC_GITHUB=ABCD1234EFGH5678
+ROIPUBLIC_AWS_CONSOLE=MNOP9012QRST3456
 ```
+
+Each variable should be added as an **encrypted secret** in Cloudflare Dashboard.
 
 ### Endpoint
 
-- **URL Pattern:** `/{identifier}`
+- **URL Pattern:** `/{identifier}/{service}`
 - **Method:** `GET`
 
 **Example Request:**
 ```bash
-curl https://2fa.daiquiri.dev/roipublic
+curl https://2fa.daiquiri.dev/roipublic/shopify-mcc
 ```
 
-**Response (JSON Lines format):**
+**Response:**
 ```json
-{"service":"GitHub","token":"123456"}
-{"service":"AWS","token":"789012"}
-{"service":"Google","token":"345678"}
+{"service":"shopify-mcc","token":"123456"}
 ```
 
 ## Security
