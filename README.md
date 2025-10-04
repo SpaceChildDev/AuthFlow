@@ -13,7 +13,7 @@ Add your TOTP secrets as **encrypted environment variables** in Cloudflare Worke
 API_KEY=7KmN9pQrS2tUvW8xYz3aB5cDe6fGhJ4L
 ```
 
-**Variable Format:** `{SERVICE}` (service name with dashes becomes underscores)
+**Variable Format:** `{SERVICE}` (use underscores, not dashes)
 
 **Example:**
 ```
@@ -22,6 +22,8 @@ SHOPIFY_MCC=CSTF6TWZ5A37WNXUUMTWMDND63V5LCWS
 GITHUB=JBSWY3DPEHPK3PXP
 AWS_CONSOLE=MNOP9012QRST3456
 ```
+
+**Note:** Use underscores in variable names (e.g., `SHOPIFY_MCC`), but you can use dashes in URLs (e.g., `/roi/shopify-mcc`).
 
 Each variable should be added as an **encrypted secret** in Cloudflare Dashboard.
 
