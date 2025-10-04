@@ -3,6 +3,17 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
 
+    // Security check - verify API key
+    const apiKey = request.headers.get('X-API-Key') || url.searchParams.get('key');
+    const validApiKey = env.API_KEY;
+
+    if (!validApiKey || apiKey !== validApiKey) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
     // TOTP helper functions
     function base32toHex(base32) {
       const base32chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
@@ -47,40 +58,75 @@ export default {
       return otp;
     }
 
-    // Extract path segments (e.g., /roipublic/shopify-mcc)
+    // Extract path segments
     const pathSegments = path.split('/').filter(s => s);
 
-    if (pathSegments.length !== 2) {
-      return new Response(JSON.stringify({ error: "Invalid path. Use /{identifier}/{service}" }), {
+    if (pathSegments.length === 0 || pathSegments.length > 2) {
+      return new Response(JSON.stringify({ error: "Invalid path. Use /{identifier} or /{identifier}/{service}" }), {
         status: 400,
         headers: { "Content-Type": "application/json" }
       });
     }
 
-    const [identifier, service] = pathSegments;
+    const identifier = pathSegments[0];
+    const service = pathSegments[1]; // optional
 
-    // Build environment variable key: ROIPUBLIC_SHOPIFY_MCC
-    const envKey = `${identifier.toUpperCase()}_${service.toUpperCase().replace(/-/g, '_')}`;
-    const secret = env[envKey];
+    // Case 1: Single service request (/roi/shopify-mcc)
+    if (service) {
+      const envKey = service.toUpperCase().replace(/-/g, '_');
+      const secret = env[envKey];
 
-    if (!secret) {
-      return new Response(JSON.stringify({ error: `No secret configured for ${envKey}` }), {
+      if (!secret) {
+        return new Response(JSON.stringify({ error: `No secret configured: ${envKey}` }), {
+          status: 404,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
+
+      try {
+        const token = await generateTOTP(secret);
+        return new Response(JSON.stringify({ service, token }), {
+          headers: { "Content-Type": "application/json" }
+        });
+      } catch (error) {
+        return new Response(JSON.stringify({ error: "Failed to generate token" }), {
+          status: 500,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
+    }
+
+    // Case 2: All services for identifier (/roi)
+    // Get all environment variables (excluding API_KEY)
+    const secrets = {};
+
+    for (const key in env) {
+      if (key !== 'API_KEY') {
+        const serviceName = key.toLowerCase().replace(/_/g, '-');
+        secrets[serviceName] = env[key];
+      }
+    }
+
+    if (Object.keys(secrets).length === 0) {
+      return new Response(JSON.stringify({ error: `No secrets configured` }), {
         status: 404,
         headers: { "Content-Type": "application/json" }
       });
     }
 
-    // Generate token
-    try {
-      const token = await generateTOTP(secret);
-      return new Response(JSON.stringify({ service, token }), {
-        headers: { "Content-Type": "application/json" }
-      });
-    } catch (error) {
-      return new Response(JSON.stringify({ error: "Failed to generate token" }), {
-        status: 500,
-        headers: { "Content-Type": "application/json" }
-      });
+    // Generate tokens for all services
+    const tokens = [];
+    for (const [name, secret] of Object.entries(secrets)) {
+      try {
+        const token = await generateTOTP(secret);
+        tokens.push({ service: name, token });
+      } catch (error) {
+        tokens.push({ service: name, error: "Failed to generate token" });
+      }
     }
+
+    return new Response(tokens.map(t => JSON.stringify(t)).join('\n'), {
+      headers: { "Content-Type": "application/json" }
+    });
   }
 };
