@@ -23,7 +23,7 @@ GITHUB=JBSWY3DPEHPK3PXP
 AWS_CONSOLE=MNOP9012QRST3456
 ```
 
-**Note:** Use underscores in variable names (e.g., `SHOPIFY_MCC`), but you can use dashes in URLs (e.g., `/roi/shopify-mcc`).
+**Note:** Cloudflare only accepts uppercase letters, numbers, and underscores in variable names (e.g., `SHOPIFY_MCC`). The worker automatically converts those names to dashed lowercase (e.g., `shopify-mcc`) in responses and URLs.
 
 Each variable should be added as an **encrypted secret** in Cloudflare Dashboard.
 
@@ -42,7 +42,7 @@ curl https://2fa.daiquiri.dev/roi/shopify-mcc?key=7KmN9pQrS2tUvW8xYz3aB5cDe6fGhJ
 
 **Response:**
 ```json
-{"service":"shopify-mcc","token":"123456"}
+{"shopify-mcc":"123456"}
 ```
 
 **Option 2: All services**
@@ -54,11 +54,13 @@ curl https://2fa.daiquiri.dev/roi/shopify-mcc?key=7KmN9pQrS2tUvW8xYz3aB5cDe6fGhJ
 curl -H "X-API-Key: 7KmN9pQrS2tUvW8xYz3aB5cDe6fGhJ4L" https://2fa.daiquiri.dev/roi
 ```
 
-**Response (JSON Lines):**
+**Response (JSON Object):**
 ```json
-{"service":"shopify-mcc","token":"123456"}
-{"service":"github","token":"789012"}
-{"service":"aws-console","token":"345678"}
+{
+  "shopify-mcc": "123456",
+  "github": "789012",
+  "aws-console": "345678"
+}
 ```
 
 ## Security
