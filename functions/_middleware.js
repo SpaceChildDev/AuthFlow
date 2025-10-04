@@ -1,5 +1,5 @@
-export default {
-  async fetch(request, env, ctx) {
+export async function onRequest(context) {
+  const { request, env } = context;
     const url = new URL(request.url);
     const path = url.pathname;
 
@@ -128,5 +128,4 @@ export default {
     return new Response(tokens.map(t => JSON.stringify(t)).join('\n'), {
       headers: { "Content-Type": "application/json" }
     });
-  }
-};
+}
