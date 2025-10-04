@@ -97,11 +97,12 @@ export async function onRequest(context) {
     }
 
     // Case 2: All services for identifier (/roi)
-    // Get all environment variables (excluding API_KEY)
+    // Get all environment variables (excluding API_KEY and Cloudflare built-ins)
     const secrets = {};
+    const excludedKeys = ['API_KEY', 'CF_PAGES', 'CF_PAGES_BRANCH', 'CF_PAGES_COMMIT_SHA', 'CF_PAGES_URL', 'ASSETS'];
 
     for (const key in env) {
-      if (key !== 'API_KEY') {
+      if (!excludedKeys.includes(key) && !key.startsWith('CF_')) {
         const serviceName = key.toLowerCase().replace(/_/g, '-');
         secrets[serviceName] = env[key];
       }
