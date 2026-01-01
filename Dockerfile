@@ -1,4 +1,4 @@
-# Dockerfile for AuthFlow Next.js App
+# Dockerfile for AuthFlow Next.js App - v1.0.1
 
 FROM node:20-alpine AS base
 

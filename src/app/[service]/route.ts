@@ -22,7 +22,10 @@ export async function GET(
 
   // 2. Security check
   if (!apiKey || apiKey !== process.env.API_KEY) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ 
+      error: 'Unauthorized', 
+      details: 'Invalid API Key. Please check your ?key= parameter.' 
+    }, { status: 401 });
   }
 
   const supabase = createClient(
@@ -30,11 +33,11 @@ export async function GET(
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  // 3. Lookup service by slug OR access_token (Using exact match for security)
-  const { data: serviceData } = await supabase
+  // 3. Lookup service (Standard PostgREST syntax for .or)
+  const { data: serviceData, error: dbError } = await supabase
     .from('otp_services')
     .select('*')
-    .or(`slug.eq."${service}",access_token.eq."${service}"`)
+    .or(`slug.eq.${service},access_token.eq.${service}`)
     .maybeSingle();
 
   let secret = serviceData?.secret;
@@ -51,13 +54,15 @@ export async function GET(
   if (!secret) {
     return NextResponse.json({ 
       error: 'No secret found',
-      details: `Service "${service}" not found.`
+      details: `Service "${service}" not found in database.`,
+      debug: { service }
     }, { status: 404 });
   }
 
   try {
     const result = await generateTOTP(secret, digits, step, algorithm, encoding);
     
+    // Non-blocking log
     if (serviceData?.id) {
       supabase.from('otp_logs').insert([
         { service_id: serviceData.id, user_id: serviceData.user_id, status_code: 200 }
