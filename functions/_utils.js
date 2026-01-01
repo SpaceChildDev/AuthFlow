@@ -29,7 +29,7 @@ export function base32ToUint8Array(base32) {
 /**
  * Generates TOTP token and its metadata
  */
-export async function generateTOTP(secret, digits = 6, period = 30) {
+export async function generateTOTP(secret, digits = 6, period = 30, algorithm = "SHA-1") {
   const keyBytes = base32ToUint8Array(secret);
   const epoch = Math.floor(Date.now() / 1000);
   const counter = Math.floor(epoch / period);
@@ -45,7 +45,7 @@ export async function generateTOTP(secret, digits = 6, period = 30) {
   const cryptoKey = await crypto.subtle.importKey(
     'raw',
     keyBytes,
-    { name: 'HMAC', hash: 'SHA-1' },
+    { name: 'HMAC', hash: algorithm },
     false,
     ['sign']
   );
@@ -66,7 +66,10 @@ export async function generateTOTP(secret, digits = 6, period = 30) {
   return {
     token: otp,
     seconds_remaining: secondsRemaining,
-    expires_at: (counter + 1) * period
+    expires_at: (counter + 1) * period,
+    algorithm,
+    digits,
+    period
   };
 }
 

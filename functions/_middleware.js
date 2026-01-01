@@ -51,6 +51,8 @@ export async function onRequest(context) {
   }
 
   const digits = parseInt(url.searchParams.get("digits")) || 6;
+  const step = parseInt(url.searchParams.get("step")) || 30;
+  const algo = (url.searchParams.get("algo") || "SHA-1").toUpperCase().replace("SHA", "SHA-");
   const isRaw = url.searchParams.get("raw") === "true";
   
   // Service name can come from path (/service) or query (?s=service or ?service=service)
@@ -80,7 +82,7 @@ export async function onRequest(context) {
     }
 
     try {
-      const result = await generateTOTP(secret, digits);
+      const result = await generateTOTP(secret, digits, step, algo);
       
       if (isRaw) {
         return new Response(result.token, {
@@ -100,14 +102,12 @@ export async function onRequest(context) {
   }
 
   // 2. If no specific service, list all tokens from ENV
-  // Note: listing all from KV might be slow/not feasible depending on volume, 
-  // so we stick to ENV for the "list all" feature unless specifically requested.
   const tokens = {};
   for (const [key, value] of Object.entries(env)) {
     if (isCandidateSecret(key, value)) {
       try {
         const serviceName = toCanonicalName(key);
-        tokens[serviceName] = await generateTOTP(value, digits);
+        tokens[serviceName] = await generateTOTP(value, digits, step, algo);
       } catch (e) {
         // Skip failed ones
       }
