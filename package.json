@@ -1,7 +1,7 @@
 {
-  "name": "flow-otp",
-  "version": "1.1.0",
-  "description": "Minimalist Cloudflare Worker for generating TOTP tokens",
+  "name": "auth-flow",
+  "version": "1.2.0",
+  "description": "AuthFlow: Minimalist Cloudflare Edge API for generating TOTP tokens",
   "main": "functions/flowotp.js",
   "scripts": {
     "dev": "wrangler pages dev .",
