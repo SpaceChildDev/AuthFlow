@@ -11,7 +11,31 @@ A full-stack TOTP management platform built with **Next.js 15**, **Shadcn UI**, 
 
 ## 🚀 Quick Start
 
-### Local Development
+--- 
+
+## 🐋 Deployment (Dokploy / Docker)
+
+AuthFlow is now Docker-ready for self-hosting on **Dokploy**.
+
+### Step 1: Prepare Dokploy
+1.  Create a new **Project** named `AuthFlow`.
+2.  Create a new **Application** within the project.
+3.  Set the **Source** to your GitHub repository and `ui` branch.
+
+### Step 2: Build Configuration
+Dokploy will automatically detect the `Dockerfile`. Ensure the following:
+-   **Port:** `3000`
+-   **Environment Variables:**
+    -   `NEXT_PUBLIC_SUPABASE_URL`
+    -   `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+    -   `API_KEY`
+
+### Step 3: Deploy
+Click **Deploy** in the Dokploy dashboard. Your instance will be built and served as a standalone Node.js application.
+
+---
+
+## 💻 Local Development
 
 ```bash
 # Install dependencies
