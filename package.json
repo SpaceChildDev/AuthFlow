@@ -1,0 +1,21 @@
+{
+  "name": "flow-otp",
+  "version": "1.1.0",
+  "description": "Minimalist Cloudflare Worker for generating TOTP tokens",
+  "main": "functions/flowotp.js",
+  "scripts": {
+    "dev": "wrangler pages dev .",
+    "deploy": "wrangler pages deploy ."
+  },
+  "keywords": [
+    "totp",
+    "otp",
+    "cloudflare-workers",
+    "cloudflare-pages"
+  ],
+  "author": "spacechild-dev",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
