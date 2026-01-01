@@ -68,7 +68,7 @@ GET /{service-name}?key=YOUR_API_KEY&raw=true
 
 We are constantly improving AuthFlow. Here is what's coming next:
 
-- [ ] **Native Chat Integrations:** Direct connection to **Slack**, **Discord**, and **Telegram** without needing n8n (Slash commands support).
+- [ ] **Native Chat Integrations:** Direct connection to **Slack**, **Discord**, and **Telegram** without needing n8n. Example: `/otp my-service-name` to get a token instantly.
 - [ ] **Request Attribution:** Track exactly *who* (which Slack user or API Key) requested each token.
 - [ ] **Secret Rotation:** Automatically rotate Base32 secrets for supported services.
 - [ ] **Hardware Key Support:** Support for physical security keys (YubiKey) to access the dashboard.
