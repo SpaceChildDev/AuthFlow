@@ -58,14 +58,15 @@
         <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 2rem 0;">
 
         <div class="endpoint">
-            <h3><span class="badge" style="background: #48bb78;">GET</span> Specific Service</h3>
-            <p><code>/[service-name]?key=YOUR_API_KEY</code></p>
-            <p>Returns JSON metadata or use <code>&raw=true</code> for just the token.</p>
+            <h3><span class="badge" style="background: #48bb78;">GET</span> Service Mode</h3>
+            <p><code>/[service-name]?key=...</code></p>
+            <p>Uses secrets stored in Cloudflare ENV or KV.</p>
         </div>
 
         <div class="endpoint">
-            <h3><span class="badge" style="background: #4299e1;">GET</span> Query Based</h3>
-            <p><code>/?s=service&key=YOUR_API_KEY</code></p>
+            <h3><span class="badge" style="background: #ed8936;">GET</span> Direct Mode</h3>
+            <p><code>/[base32-secret]?key=...</code></p>
+            <p>Generates token directly from the provided string.</p>
         </div>
 
         <h3>Quick Example</h3>

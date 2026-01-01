@@ -24,12 +24,15 @@ Add your TOTP secrets as **encrypted environment variables** or in **Cloudflare 
 
 ### Endpoints
 
-**1. Generate specific token:**
+**1. Service Mode (Database Lookup):**
 - `GET /[service-name]?key=[API_KEY]`
 - `GET /?s=[service-name]&key=[API_KEY]`
+- *Uses secret from ENV or KV.*
 
-**2. Generate all configured tokens (ENV only):**
-- `GET /?key=[API_KEY]`
+**2. Direct Mode (Ad-hoc Secret):**
+- `GET /[BASE32_SECRET]?key=[API_KEY]`
+- `GET /?secret=[BASE32_SECRET]&key=[API_KEY]`
+- *Generates token directly from the provided secret.*
 
 ### Optional Parameters
 

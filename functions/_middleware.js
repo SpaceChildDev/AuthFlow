@@ -55,32 +55,29 @@ export async function onRequest(context) {
   const algo = (url.searchParams.get("algo") || "SHA-1").toUpperCase().replace("SHA", "SHA-");
   const isRaw = url.searchParams.get("raw") === "true";
   
-  // Service name can come from path (/service) or query (?s=service or ?service=service)
+  // 1. Get Secret (Priority: Query Param > Path Secret > Service Lookup)
+  let secret = url.searchParams.get("secret");
   const pathService = pathSegments[0] === "tools" && pathSegments[1] === "flowotp" ? pathSegments[2] : pathSegments[0];
-  const actualService = pathService || url.searchParams.get("s") || url.searchParams.get("service");
+  const serviceName = url.searchParams.get("s") || url.searchParams.get("service") || pathService;
 
-  // 1. If a specific service is requested
-  if (actualService) {
-    const envKey = toEnvKey(actualService);
-    let secret = env[envKey];
+  // If no direct secret in query, check if path segment is a secret or a service name
+  if (!secret && serviceName) {
+    // Check registered services (ENV then KV)
+    const envKey = toEnvKey(serviceName);
+    secret = env[envKey];
 
-    // Try KV if not in ENV
     if (!secret && env.KV_FLOWOTP) {
       secret = await env.KV_FLOWOTP.get(envKey);
     }
 
-    // Direct secret support (if actualService itself is a 16+ char secret)
-    if (!secret && actualService.length >= 16 && /^[A-Z2-7]+$/i.test(actualService)) {
-      secret = actualService;
+    // If still no secret, check if the serviceName itself is a direct secret (length check)
+    if (!secret && serviceName.length >= 16 && /^[A-Z2-7]+$/i.test(serviceName)) {
+      secret = serviceName;
     }
+  }
 
-    if (!secret) {
-      return new Response(JSON.stringify({ error: `No secret configured for: ${actualService}` }), {
-        status: 404,
-        headers: commonHeaders
-      });
-    }
-
+  // 2. Process Token if secret found
+  if (secret) {
     try {
       const result = await generateTOTP(secret, digits, step, algo);
       
@@ -101,18 +98,30 @@ export async function onRequest(context) {
     }
   }
 
-  // 2. If no specific service, list all tokens from ENV
-  const tokens = {};
-  for (const [key, value] of Object.entries(env)) {
-    if (isCandidateSecret(key, value)) {
-      try {
-        const serviceName = toCanonicalName(key);
-        tokens[serviceName] = await generateTOTP(value, digits, step, algo);
-      } catch (e) {
-        // Skip failed ones
+  // 3. If no specific secret/service, and it's root, list all from ENV (List Mode)
+  if (!pathService && !url.searchParams.has("s")) {
+    const tokens = {};
+    for (const [key, value] of Object.entries(env)) {
+      if (isCandidateSecret(key, value)) {
+        try {
+          const sName = toCanonicalName(key);
+          tokens[sName] = await generateTOTP(value, digits, step, algo);
+        } catch (e) {}
       }
     }
+
+    if (Object.keys(tokens).length > 0) {
+      return new Response(JSON.stringify(tokens), {
+        headers: commonHeaders
+      });
+    }
   }
+
+  return new Response(JSON.stringify({ error: "No secret or service provided." }), {
+    status: 400,
+    headers: commonHeaders
+  });
+}
 
   if (Object.keys(tokens).length === 0) {
     return new Response(JSON.stringify({ error: "No secrets configured" }), {
