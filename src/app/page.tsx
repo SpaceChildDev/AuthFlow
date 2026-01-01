@@ -1,132 +1,78 @@
-import React from 'react';
+import { Shield, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Shield, Plus, RefreshCw, Key, ExternalLink } from "lucide-react";
+import Link from "next/link";
+import { BuyMeACoffee } from "@/components/bmc-button";
 
-// Mock data - This will come from Supabase later
-const mockServices = [
-  { id: 1, name: 'Github', slug: 'github', lastUsed: '2 mins ago', digits: 6 },
-  { id: 2, name: 'AWS Console', slug: 'aws', lastUsed: '1 hour ago', digits: 6 },
-  { id: 3, name: 'Shopify Admin', slug: 'shopify', lastUsed: 'Yesterday', digits: 6 },
-];
-
-export default function Dashboard() {
+export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
-        
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">AuthFlow Dashboard</h1>
-            <p className="text-slate-500 dark:text-slate-400">Manage your automated 2FA tokens at the edge.</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm">
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Refresh
-            </Button>
-            <Button size="sm">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Service
-            </Button>
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-slate-500">Total Services</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{mockServices.length}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-slate-500">API Requests (24h)</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">1,284</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-slate-500">Security Score</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">A+</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Services Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Registered Services</CardTitle>
-            <CardDescription>
-              A list of services currently configured for automated TOTP generation.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Service Name</TableHead>
-                  <TableHead>Slug / Identifier</TableHead>
-                  <TableHead>Digits</TableHead>
-                  <TableHead>Last Used</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {mockServices.map((service) => (
-                  <TableRow key={service.id}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-2">
-                        <Shield className="h-4 w-4 text-blue-500" />
-                        {service.name}
-                      </div>
-                    </TableCell>
-                    <TableCell><code>/{service.slug}</code></TableCell>
-                    <TableCell>{service.digits}</TableCell>
-                    <TableCell className="text-slate-500 text-sm">{service.lastUsed}</TableCell>
-                    <TableCell className="text-right space-x-2">
-                      <Button variant="ghost" size="icon">
-                        <Key className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-
-        {/* Documentation / Webhook Preview */}
-        <Card className="bg-slate-900 text-slate-50 border-none shadow-xl">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Shield className="h-5 w-5 text-green-400" />
-              Webhook Integration
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-slate-400 text-sm">
-              Use this endpoint in n8n or any HTTP client to fetch tokens dynamically.
-            </p>
-            <div className="bg-slate-800 p-3 rounded-md font-mono text-xs overflow-x-auto border border-slate-700">
-              <code>GET https://authflow.daiquiri.dev/api/otp/github?key=YOUR_API_KEY&raw=true</code>
+    <div className="min-h-screen bg-white dark:bg-slate-950">
+      <header className="border-b bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight">
+            <div className="bg-blue-600 text-white p-1.5 rounded-lg">
+              <Shield className="h-5 w-5" />
             </div>
-          </CardContent>
-        </Card>
+            AuthFlow
+          </Link>
+          <div className="flex items-center gap-3">
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/login">Sign In</Link>
+            </Button>
+            <Button asChild size="sm" className="bg-blue-600 hover:bg-blue-700">
+              <Link href="/dashboard">Dashboard</Link>
+            </Button>
+          </div>
+        </div>
+      </header>
 
-      </div>
+      <main className="flex flex-col items-center justify-center py-20 px-4 text-center">
+        <div className="bg-blue-600/10 text-blue-600 p-3 rounded-2xl mb-6">
+          <Shield className="h-12 w-12" />
+        </div>
+        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
+          AuthFlow V2
+        </h1>
+        <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mb-10 leading-relaxed">
+          The ultimate TOTP management platform for automation enthusiasts. 
+          Securely store, manage, and generate 2FA tokens at the edge.
+        </p>
+        <div className="flex flex-wrap justify-center gap-4">
+          <Button asChild size="lg" className="h-14 px-8 text-lg font-semibold rounded-xl shadow-lg shadow-blue-500/20 bg-blue-600 hover:bg-blue-700">
+            <Link href="/dashboard">
+              Get Started <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
+          </Button>
+        </div>
+        
+        <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl w-full text-left">
+          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border shadow-sm">
+            <div className="bg-green-500/10 text-green-600 w-10 h-10 flex items-center justify-center rounded-lg mb-4">
+              <Shield className="h-6 w-6" />
+            </div>
+            <h3 className="text-lg font-bold mb-2">Secure Storage</h3>
+            <p className="text-slate-500 text-sm">Encrypted secrets managed via Supabase and Cloudflare KV for maximum security.</p>
+          </div>
+          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border shadow-sm">
+            <div className="bg-blue-500/10 text-blue-600 w-10 h-10 flex items-center justify-center rounded-lg mb-4">
+              <ArrowRight className="h-6 w-6" />
+            </div>
+            <h3 className="text-lg font-bold mb-2">n8n Friendly</h3>
+            <p className="text-slate-500 text-sm">Clean REST API designed specifically for easy integration with n8n and other tools.</p>
+          </div>
+          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border shadow-sm">
+            <div className="bg-purple-500/10 text-purple-600 w-10 h-10 flex items-center justify-center rounded-lg mb-4">
+              <ArrowRight className="h-6 w-6" />
+            </div>
+            <h3 className="text-lg font-bold mb-2">Edge Performance</h3>
+            <p className="text-slate-500 text-sm">Powered by Next.js and Cloudflare for sub-millisecond response times globally.</p>
+          </div>
+        </div>
+      </main>
+
+      <footer className="py-12 border-t bg-slate-50 dark:bg-slate-900/50 flex flex-col items-center gap-6">
+        <BuyMeACoffee />
+        <p className="text-slate-500 text-sm">Created with ❤️ by spacechild-dev</p>
+      </footer>
     </div>
   );
 }

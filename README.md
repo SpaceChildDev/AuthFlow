@@ -35,7 +35,7 @@ AWS=MNOP9012QRST3456...
 Fetch tokens directly for your automations:
 
 ```http
-GET /api/otp/github?key=YOUR_API_KEY&raw=true
+GET /{service-name}?key=YOUR_API_KEY&raw=true
 ```
 
 ## 🏗️ Tech Stack
