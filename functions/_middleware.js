@@ -51,13 +51,11 @@ export async function onRequest(context) {
   }
 
   const digits = parseInt(url.searchParams.get("digits")) || 6;
-  const serviceSegment = pathSegments[0]; // Format: /service-name or /tools/flowotp/service-name
-
-  // Special handling for /tools/flowotp/ prefix
-  let actualService = serviceSegment;
-  if (serviceSegment === "tools" && pathSegments[1] === "flowotp") {
-    actualService = pathSegments[2];
-  }
+  const isRaw = url.searchParams.get("raw") === "true";
+  
+  // Service name can come from path (/service) or query (?s=service or ?service=service)
+  const pathService = pathSegments[0] === "tools" && pathSegments[1] === "flowotp" ? pathSegments[2] : pathSegments[0];
+  const actualService = pathService || url.searchParams.get("s") || url.searchParams.get("service");
 
   // 1. If a specific service is requested
   if (actualService) {
@@ -83,6 +81,13 @@ export async function onRequest(context) {
 
     try {
       const result = await generateTOTP(secret, digits);
+      
+      if (isRaw) {
+        return new Response(result.token, {
+          headers: { ...commonHeaders, "Content-Type": "text/plain" }
+        });
+      }
+
       return new Response(JSON.stringify(result), {
         headers: commonHeaders
       });

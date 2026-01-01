@@ -25,15 +25,22 @@ Add your TOTP secrets as **encrypted environment variables** or in **Cloudflare 
 ### Endpoints
 
 **1. Generate specific token:**
-`GET /[service-name]?key=[API_KEY]`
+- `GET /[service-name]?key=[API_KEY]`
+- `GET /?s=[service-name]&key=[API_KEY]`
 
 **2. Generate all configured tokens (ENV only):**
-`GET /?key=[API_KEY]`
+- `GET /?key=[API_KEY]`
 
-**Example:**
+### Optional Parameters
+
+- `digits`: Number of digits (default: 6).
+- `raw`: Set to `true` to get only the token string (text/plain) instead of JSON.
+
+**Example (n8n friendly):**
 ```http
-GET https://flow-otp.pages.dev/shopify-mcc?key=your-api-key
+GET https://flow-otp.pages.dev/?s=github&key=your-key&raw=true
 ```
+**Response:** `123456`
 
 ### Integration with n8n
 
