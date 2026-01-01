@@ -34,9 +34,9 @@ AuthFlow leverages the **Web Crypto API** (`crypto.subtle`) available in the Clo
 1.  **Fork or Clone** this repository to your GitHub account.
 2.  Go to the **Cloudflare Dashboard** > **Workers & Pages** > **Create application** > **Pages** > **Connect to Git**.
 3.  Select the `AuthFlow` repository.
-4.  **Build settings:**
-    *   **Framework preset:** None
-    *   **Build command:** Leave empty (or `npm run build` if you add one later)
+4.  **Build settings (CRITICAL):**
+    *   **Framework preset:** `None`
+    *   **Build command:** **LEAVE THIS EMPTY** (Do not use `wrangler deploy`)
     *   **Build output directory:** `/` (root)
 5.  Click **Save and Deploy**.
 
