@@ -142,127 +142,129 @@ export function DataTable({ data, apiKey }: { data: any[], apiKey: string | unde
 
   return (
     <div className="rounded-xl border bg-white dark:bg-slate-900 overflow-hidden shadow-sm">
-      <Table>
-        <TableHeader className="bg-slate-50/50 dark:bg-slate-800/50">
-          <TableRow>
-            <TableHead className="w-[180px] font-bold">Service</TableHead>
-            <TableHead className="w-[250px] font-bold">Webhook URL</TableHead>
-            <TableHead className="w-[100px] font-bold">Algorithm</TableHead>
-            <TableHead className="w-[80px] font-bold text-center">Step</TableHead>
-            <TableHead className="w-[80px] font-bold text-center">Digits</TableHead>
-            <TableHead className="w-[80px] font-bold text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.length > 0 ? (
-            data.map((item) => (
-              <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors border-b last:border-0">
-                <TableCell className="font-semibold">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-blue-600 text-white p-1.5 rounded-lg shadow-sm">
-                      <IconKey size={14} />
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader className="bg-slate-50/50 dark:bg-slate-800/50">
+            <TableRow>
+              <TableHead className="w-[180px] font-bold">Service</TableHead>
+              <TableHead className="min-w-[450px] font-bold">Webhook URL</TableHead>
+              <TableHead className="w-[100px] font-bold">Algorithm</TableHead>
+              <TableHead className="w-[80px] font-bold text-center">Step</TableHead>
+              <TableHead className="w-[80px] font-bold text-center">Digits</TableHead>
+              <TableHead className="w-[80px] font-bold text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.length > 0 ? (
+              data.map((item) => (
+                <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors border-b last:border-0">
+                  <TableCell className="font-semibold">
+                    <div className="flex items-center gap-2">
+                      <div className="bg-blue-600 text-white p-1.5 rounded-lg shadow-sm">
+                        <IconKey size={14} />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="flex items-center gap-1 whitespace-nowrap">
+                          {item.name}
+                          {item.access_token && <Lock className="h-2.5 w-2.5 text-orange-500" title="Private URL Active" />}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground font-normal lowercase italic">{item.encoding}</span>
+                      </div>
                     </div>
-                    <div className="flex flex-col">
-                      <span className="flex items-center gap-1">
-                        {item.name}
-                        {item.access_token && <Lock className="h-2.5 w-2.5 text-orange-500" title="Private URL Active" />}
-                      </span>
-                      <span className="text-[10px] text-muted-foreground font-normal lowercase italic">{item.encoding}</span>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2 group w-full">
-                    <code className="text-[10px] font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 flex-1 truncate max-w-[200px]" title={getWebhookUrl(item)}>
-                      {getWebhookUrl(item)}
-                    </code>
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      className="h-7 w-7 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" 
-                      onClick={() => copyToClipboard(getWebhookUrl(item))}
-                      disabled={!origin}
-                    >
-                      <IconCopy size={12} className="text-blue-600" />
-                    </Button>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-                    <Fingerprint size={12} className="text-slate-400" />
-                    {item.algorithm || 'SHA-1'}
-                  </div>
-                </TableCell>
-                <TableCell className="text-center">
-                  <div className="flex flex-col items-center gap-0.5">
-                    <Clock size={12} className="text-slate-400" />
-                    <span className="text-xs font-mono text-slate-500">{item.step}s</span>
-                  </div>
-                </TableCell>
-                <TableCell className="text-center font-mono text-sm text-slate-600">{item.digits}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <IconDotsVertical size={16} />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                      <DropdownMenuItem onClick={() => fetchLiveCode(item)}>
-                        <IconRefresh className="mr-2 h-4 w-4" />
-                        View Live Code
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => copyToClipboard(getWebhookUrl(item))}>
-                        <IconCopy className="mr-2 h-4 w-4" />
-                        Copy Webhook
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => setEditingService(item)}>
-                        <IconEdit className="mr-2 h-4 w-4" />
-                        Edit Configuration
-                      </DropdownMenuItem>
-                      {item.access_token ? (
-                        <>
-                          <DropdownMenuItem onClick={() => rotateUrl(item)}>
-                            <IconRefresh className="mr-2 h-4 w-4 text-orange-500" />
-                            Rotate Private URL
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => resetUrl(item)}>
-                            <Globe className="mr-2 h-4 w-4 text-blue-500" />
-                            Reset to Public URL
-                          </DropdownMenuItem>
-                        </>
-                      ) : (
-                        <DropdownMenuItem onClick={() => rotateUrl(item)}>
-                          <Lock className="mr-2 h-4 w-4 text-orange-500" />
-                          Enable Private URL
-                        </DropdownMenuItem>
-                      )}
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem 
-                        className="text-red-600 focus:bg-red-50 focus:text-red-600"
-                        onClick={() => deleteService(item.id, item.name)}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2 group w-full">
+                      <code className="text-[10px] font-mono bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 flex-1 whitespace-nowrap">
+                        {getWebhookUrl(item)}
+                      </code>
+                      <Button 
+                        variant="outline" 
+                        size="icon" 
+                        className="h-8 w-8 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" 
+                        onClick={() => copyToClipboard(getWebhookUrl(item))}
+                        disabled={!origin}
                       >
-                        <IconTrash className="mr-2 h-4 w-4" />
-                        Delete Service
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                        <IconCopy size={12} className="text-blue-600" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium whitespace-nowrap">
+                      <Fingerprint size={12} className="text-slate-400" />
+                      {item.algorithm || 'SHA-1'}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <div className="flex flex-col items-center gap-0.5 whitespace-nowrap">
+                      <Clock size={12} className="text-slate-400" />
+                      <span className="text-xs font-mono text-slate-500">{item.step}s</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center font-mono text-sm text-slate-600">{item.digits}</TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <IconDotsVertical size={16} />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem onClick={() => fetchLiveCode(item)}>
+                          <IconRefresh className="mr-2 h-4 w-4" />
+                          View Live Code
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => copyToClipboard(getWebhookUrl(item))}>
+                          <IconCopy className="mr-2 h-4 w-4" />
+                          Copy Webhook
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => setEditingService(item)}>
+                          <IconEdit className="mr-2 h-4 w-4" />
+                          Edit Configuration
+                        </DropdownMenuItem>
+                        {item.access_token ? (
+                          <>
+                            <DropdownMenuItem onClick={() => rotateUrl(item)}>
+                              <IconRefresh className="mr-2 h-4 w-4 text-orange-500" />
+                              Rotate Private URL
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => resetUrl(item)}>
+                              <Globe className="mr-2 h-4 w-4 text-blue-500" />
+                              Reset to Public URL
+                            </DropdownMenuItem>
+                          </>
+                        ) : (
+                          <DropdownMenuItem onClick={() => rotateUrl(item)}>
+                            <Lock className="mr-2 h-4 w-4 text-orange-500" />
+                            Enable Private URL
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem 
+                          className="text-red-600 focus:bg-red-50 focus:text-red-600"
+                          onClick={() => deleteService(item.id, item.name)}
+                        >
+                          <IconTrash className="mr-2 h-4 w-4" />
+                          Delete Service
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} className="h-32 text-center">
+                  <div className="flex flex-col items-center justify-center text-muted-foreground gap-2">
+                    <IconKey size={32} stroke={1} />
+                    <p>Henüz servis eklenmemiş.</p>
+                  </div>
                 </TableCell>
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={6} className="h-32 text-center">
-                <div className="flex flex-col items-center justify-center text-muted-foreground gap-2">
-                  <IconKey size={32} stroke={1} />
-                  <p>Henüz servis eklenmemiş.</p>
-                </div>
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
       {/* Live Code Dialog */}
       <Dialog open={!!selectedService} onOpenChange={(open) => !open && setSelectedService(null)}>
