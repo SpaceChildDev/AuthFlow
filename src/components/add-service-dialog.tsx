@@ -21,7 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Switch } from "@/components/ui/checkbox"
 import { Plus, Loader2, Sparkles, ChevronDown, ChevronUp, Lock } from "lucide-react"
 import { createClient } from "@/lib/supabase"
 import { toast } from "sonner"
