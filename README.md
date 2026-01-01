@@ -28,17 +28,43 @@ AuthFlow leverages the **Web Crypto API** (`crypto.subtle`) available in the Clo
 
 ---
 
-## 🛠️ Configuration & Setup
+## 🚀 Deployment (How to Install)
 
-### 1. Environment Variables (Recommended for few secrets)
-Add these in your Cloudflare Dashboard:
-- `API_KEY`: A strong random string to protect your API.
-- `SERVICE_NAME`: The Base32 secret for a specific service (e.g., `GITHUB`, `SHOPIFY_STORE`).
+### Step 1: Deploy to Cloudflare Pages
+1.  **Fork or Clone** this repository to your GitHub account.
+2.  Go to the **Cloudflare Dashboard** > **Workers & Pages** > **Create application** > **Pages** > **Connect to Git**.
+3.  Select the `AuthFlow` repository.
+4.  **Build settings:**
+    *   **Framework preset:** None
+    *   **Build command:** Leave empty (or `npm run build` if you add one later)
+    *   **Build output directory:** `/` (root)
+5.  Click **Save and Deploy**.
 
-### 2. Cloudflare KV (Recommended for many secrets)
-1. Create a KV Namespace.
-2. Bind it to your project with the variable name `KV_FLOWOTP`.
-3. Add keys in UPPERCASE (e.g., `AWS_PROD`) and their Base32 secrets as values.
+### Step 2: Configure Secrets
+1.  In your Pages project, go to **Settings** > **Functions** > **Environment variables**.
+2.  Add `API_KEY` (Your master password for the API).
+3.  Add your service secrets (e.g., `GITHUB = JBSWY3D...`).
+4.  *Optional:* Create a KV Namespace named `KV_FLOWOTP` and bind it under **Settings** > **Functions** > **KV namespace bindings**.
+
+### Step 3: Custom Domain
+1.  Go to **Custom domains** in your Pages project settings.
+2.  Add `authflow.daiquiri.dev`.
+3.  Cloudflare will automatically handle the DNS and SSL certificate.
+
+---
+
+## 💻 Local Development
+
+Run AuthFlow on your machine for testing:
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Start local server (uses Wrangler)
+npm run dev
+```
+Local endpoint: `http://localhost:8788`
 
 ---
 
