@@ -62,6 +62,20 @@ Fetch tokens directly for your automations:
 GET /{service-name}?key=YOUR_API_KEY&raw=true
 ```
 
+--- 
+
+## 🗺️ Roadmap (Planned Features)
+
+We are constantly improving AuthFlow. Here is what's coming next:
+
+- [ ] **Native Chat Integrations:** Direct connection to **Slack**, **Discord**, and **Telegram** without needing n8n (Slash commands support).
+- [ ] **Request Attribution:** Track exactly *who* (which Slack user or API Key) requested each token.
+- [ ] **Secret Rotation:** Automatically rotate Base32 secrets for supported services.
+- [ ] **Hardware Key Support:** Support for physical security keys (YubiKey) to access the dashboard.
+- [ ] **Advanced Encryption:** Bring-your-own-key (BYOK) for veritabanı encryption.
+
+---
+
 ## 🏗️ Tech Stack
 
 - **Framework:** [Next.js 15](https://nextjs.org)
