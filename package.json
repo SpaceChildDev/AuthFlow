@@ -2,7 +2,7 @@
   "name": "auth-flow",
   "version": "1.2.0",
   "description": "AuthFlow: Minimalist Cloudflare Edge API for generating TOTP tokens",
-  "main": "functions/flowotp.js",
+  "main": "functions/_middleware.js",
   "scripts": {
     "dev": "wrangler pages dev .",
     "deploy": "wrangler pages deploy ."

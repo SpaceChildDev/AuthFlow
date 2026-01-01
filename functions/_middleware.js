@@ -20,7 +20,7 @@ function isCandidateSecret(key, value) {
   if (typeof value !== "string" || value.trim().length < 16) return false;
   
   const sanitized = value.trim().toUpperCase().replace(/\s+/g, "").replace(/=+$/, "");
-  const forbiddenKeys = ["API_KEY", "ASSETS", "KV_FLOWOTP"]; // Add KV binding name here if needed
+  const forbiddenKeys = ["API_KEY", "ASSETS", "KV_AUTHFLOW"]; // Add KV binding name here if needed
 
   return (
     /^[A-Z0-9_]+$/.test(key) &&
@@ -57,7 +57,7 @@ export async function onRequest(context) {
   
   // 1. Get Secret (Priority: Query Param > Path Secret > Service Lookup)
   let secret = url.searchParams.get("secret");
-  const pathService = pathSegments[0] === "tools" && pathSegments[1] === "flowotp" ? pathSegments[2] : pathSegments[0];
+  const pathService = pathSegments[0] === "tools" && pathSegments[1] === "authflow" ? pathSegments[2] : pathSegments[0];
   const serviceName = url.searchParams.get("s") || url.searchParams.get("service") || pathService;
 
   // If no direct secret in query, check if path segment is a secret or a service name
@@ -66,8 +66,8 @@ export async function onRequest(context) {
     const envKey = toEnvKey(serviceName);
     secret = env[envKey];
 
-    if (!secret && env.KV_FLOWOTP) {
-      secret = await env.KV_FLOWOTP.get(envKey);
+    if (!secret && env.KV_AUTHFLOW) {
+      secret = await env.KV_AUTHFLOW.get(envKey);
     }
 
     // If still no secret, check if the serviceName itself is a direct secret (length check)

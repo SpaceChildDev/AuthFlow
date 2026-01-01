@@ -44,7 +44,7 @@ AuthFlow leverages the **Web Crypto API** (`crypto.subtle`) available in the Clo
 1.  In your Pages project, go to **Settings** > **Functions** > **Environment variables**.
 2.  Add `API_KEY` (Your master password for the API).
 3.  Add your service secrets (e.g., `GITHUB = JBSWY3D...`).
-4.  *Optional:* Create a KV Namespace named `KV_FLOWOTP` and bind it under **Settings** > **Functions** > **KV namespace bindings**.
+4.  *Optional:* Create a KV Namespace named `KV_AUTHFLOW` and bind it under **Settings** > **Functions** > **KV namespace bindings**.
 
 ### Step 3: Custom Domain
 1.  Go to **Custom domains** in your Pages project settings.
