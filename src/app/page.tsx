@@ -1,4 +1,4 @@
-import { Shield, ArrowRight } from "lucide-react";
+import { Shield, ArrowRight, Server, Globe, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { BuyMeACoffee } from "@/components/bmc-button";
@@ -47,21 +47,21 @@ export default function LandingPage() {
         <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl w-full text-left">
           <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border shadow-sm">
             <div className="bg-green-500/10 text-green-600 w-10 h-10 flex items-center justify-center rounded-lg mb-4">
-              <Shield className="h-6 w-6" />
+              <Server className="h-6 w-6" />
             </div>
             <h3 className="text-lg font-bold mb-2">Secure Storage</h3>
             <p className="text-slate-500 text-sm">Encrypted secrets managed via Supabase and Cloudflare KV for maximum security.</p>
           </div>
           <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border shadow-sm">
             <div className="bg-blue-500/10 text-blue-600 w-10 h-10 flex items-center justify-center rounded-lg mb-4">
-              <ArrowRight className="h-6 w-6" />
+              <Zap className="h-6 w-6" />
             </div>
             <h3 className="text-lg font-bold mb-2">n8n Friendly</h3>
             <p className="text-slate-500 text-sm">Clean REST API designed specifically for easy integration with n8n and other tools.</p>
           </div>
           <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border shadow-sm">
             <div className="bg-purple-500/10 text-purple-600 w-10 h-10 flex items-center justify-center rounded-lg mb-4">
-              <ArrowRight className="h-6 w-6" />
+              <Globe className="h-6 w-6" />
             </div>
             <h3 className="text-lg font-bold mb-2">Edge Performance</h3>
             <p className="text-slate-500 text-sm">Powered by Next.js and Cloudflare for sub-millisecond response times globally.</p>
@@ -71,7 +71,7 @@ export default function LandingPage() {
 
       <footer className="py-12 border-t bg-slate-50 dark:bg-slate-900/50 flex flex-col items-center gap-6">
         <BuyMeACoffee />
-        <p className="text-slate-500 text-sm">Created with ❤️ by spacechild-dev</p>
+        <p className="text-slate-500 text-sm">Created by spacechild-dev</p>
       </footer>
     </div>
   );

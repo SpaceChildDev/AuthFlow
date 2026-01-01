@@ -1,19 +1,19 @@
-# AuthFlow V2 🛡️ (Dashboard)
+# AuthFlow V2 (Dashboard)
 
 A full-stack TOTP management platform built with **Next.js 15**, **Shadcn UI**, and **Tailwind CSS**.
 
-## ✨ Features
+## Features
 
 - **Dynamic Dashboard:** Manage all your TOTP secrets from a modern UI.
 - **Full-Stack API:** Robust backend endpoints for automation (n8n, CI/CD).
 - **Edge Performance:** Optimized for deployment on Cloudflare Pages or Vercel.
 - **Highly Secure:** Ready for encrypted database storage (Supabase/Prisma).
 
-## 🚀 Quick Start
+## Quick Start
 
 --- 
 
-## 🐋 Deployment (Dokploy / Docker)
+## Deployment (Dokploy / Docker)
 
 AuthFlow is now Docker-ready for self-hosting on **Dokploy**.
 
@@ -35,7 +35,7 @@ Click **Deploy** in the Dokploy dashboard. Your instance will be built and serve
 
 ---
 
-## 💻 Local Development
+## Local Development
 
 ```bash
 # Install dependencies
@@ -54,7 +54,7 @@ GITHUB=JBSWY3DPEHPK3PXP...
 AWS=MNOP9012QRST3456...
 ```
 
-## 📡 Webhook Integration
+## Webhook Integration
 
 Fetch tokens directly for your automations:
 
@@ -64,7 +64,7 @@ GET /{service-name}?key=YOUR_API_KEY&raw=true
 
 --- 
 
-## 🗺️ Roadmap (Planned Features)
+## Roadmap (Planned Features)
 
 We are constantly improving AuthFlow. Here is what's coming next:
 
@@ -76,12 +76,12 @@ We are constantly improving AuthFlow. Here is what's coming next:
 
 ---
 
-## 🏗️ Tech Stack
+## Tech Stack
 
 - **Framework:** [Next.js 15](https://nextjs.org)
 - **UI Components:** [Shadcn UI](https://ui.shadcn.com)
 - **Styling:** [Tailwind CSS 4](https://tailwindcss.com)
-- **TOTP Logic:** [otplib](https://yeojz.github.io/otplib/)
+- **TOTP Logic:** Custom Web Crypto Implementation
 - **Icons:** [Lucide React](https://lucide.dev)
 
 ---
