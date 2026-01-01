@@ -166,7 +166,7 @@ export function DataTable({ data, apiKey }: { data: any[], apiKey: string | unde
                       <div className="flex flex-col">
                         <span className="flex items-center gap-1 whitespace-nowrap">
                           {item.name}
-                          {item.access_token && <Lock className="h-2.5 w-2.5 text-orange-500" title="Private URL Active" />}
+                          {item.access_token && <span title="Private URL Active"><Lock className="h-2.5 w-2.5 text-orange-500" /></span>}
                         </span>
                         <span className="text-[10px] text-muted-foreground font-normal lowercase italic">{item.encoding}</span>
                       </div>

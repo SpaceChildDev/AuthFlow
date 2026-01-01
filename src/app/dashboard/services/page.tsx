@@ -9,6 +9,8 @@ import { createClient } from '@/lib/supabase-server';
 import { redirect } from 'next/navigation';
 import { AddServiceDialog } from '@/components/add-service-dialog';
 
+export const runtime = 'edge'
+
 export default async function Page() {
   const supabase = await createClient();
   

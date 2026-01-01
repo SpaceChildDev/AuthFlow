@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Key, BarChart3 } from "lucide-react";
 import Link from "next/link";
 
+export const runtime = 'edge'
+
 export default async function Page() {
   const supabase = await createClient();
   

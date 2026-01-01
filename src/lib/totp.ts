@@ -112,7 +112,7 @@ export async function generateTOTP(
 
   const cryptoKey = await crypto.subtle.importKey(
     'raw',
-    keyBytes,
+    keyBytes as BufferSource,
     { name: 'HMAC', hash: finalAlgorithm },
     false,
     ['sign']
