@@ -122,15 +122,3 @@ export async function onRequest(context) {
     headers: commonHeaders
   });
 }
-
-  if (Object.keys(tokens).length === 0) {
-    return new Response(JSON.stringify({ error: "No secrets configured" }), {
-      status: 404,
-      headers: commonHeaders
-    });
-  }
-
-  return new Response(JSON.stringify(tokens), {
-    headers: commonHeaders
-  });
-}
