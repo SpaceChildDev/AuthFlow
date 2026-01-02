@@ -57,7 +57,15 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  let user = null
+  try {
+    const { data } = await supabase.auth.getUser()
+    user = data.user
+  } catch (error) {
+    // If Supabase credentials are not set or invalid, getUser might throw.
+    // We treat this as no user logged in.
+    console.error('Middleware Supabase Error:', error)
+  }
 
   // Protected routes logic
   if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
