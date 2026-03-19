@@ -10,25 +10,25 @@ export default async function Page() {
   const session = await auth()
   if (!session?.user) redirect('/login')
 
-  const sevenDaysAgo = new Date()
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-
-  const logs = await sql`
-    SELECT created_at FROM otp_logs
+  const rows = await sql`
+    SELECT
+      TO_CHAR(DATE_TRUNC('day', created_at AT TIME ZONE 'UTC'), 'YYYY-MM-DD') AS date,
+      COUNT(*)::int AS requests
+    FROM otp_logs
     WHERE user_id = ${session.user.id}
-    AND created_at >= ${sevenDaysAgo.toISOString()}
+      AND created_at >= NOW() - INTERVAL '7 days'
+    GROUP BY DATE_TRUNC('day', created_at AT TIME ZONE 'UTC')
+    ORDER BY DATE_TRUNC('day', created_at AT TIME ZONE 'UTC') ASC
   `
 
+  // Fill in missing days with 0
+  const countMap = new Map(rows.map((r: any) => [r.date, r.requests]))
   const chartData = []
   for (let i = 6; i >= 0; i--) {
     const d = new Date()
     d.setDate(d.getDate() - i)
     const dateStr = d.toISOString().split('T')[0]
-    const count = (logs as any).filter((log: any) => {
-       const logDate = log.created_at instanceof Date ? log.created_at.toISOString() : String(log.created_at);
-       return logDate.startsWith(dateStr)
-    }).length
-    chartData.push({ date: dateStr, requests: count })
+    chartData.push({ date: dateStr, requests: countMap.get(dateStr) ?? 0 })
   }
 
   return (

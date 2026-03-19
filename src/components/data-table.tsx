@@ -4,10 +4,10 @@ import * as React from "react"
 import {
   IconDotsVertical,
   IconKey,
+  IconRefresh,
   IconCopy,
   IconEdit,
   IconTrash,
-  IconRefresh,
 } from "@tabler/icons-react"
 import {
   Table,
@@ -35,45 +35,50 @@ import {
 import { toast } from "sonner"
 import { Loader2, Lock, Globe, Clock, Fingerprint } from "lucide-react"
 import { EditServiceDialog } from "./edit-service-dialog"
+import { useRouter } from "next/navigation"
 
-export function DataTable({ data, apiKey }: { data: any[], apiKey: string | undefined }) {
+export function DataTable({ data }: { data: any[] }) {
   const [selectedService, setSelectedService] = React.useState<any>(null)
   const [editingService, setEditingService] = React.useState<any>(null)
   const [liveCode, setLiveCode] = React.useState<any>(null)
   const [isFetching, setIsFetching] = React.useState(false)
   const [origin, setOrigin] = React.useState("")
+  const [apiKey, setApiKey] = React.useState("")
+  const router = useRouter()
 
   React.useEffect(() => {
     setOrigin(window.location.origin)
+    fetch('/api/me/apikey')
+      .then(r => r.json())
+      .then(d => setApiKey(d.apiKey ?? ''))
+      .catch(() => {})
   }, [])
 
   const getWebhookUrl = (item: any) => {
-    if (!origin) return "Loading..."
+    if (!origin || !apiKey) return "Loading..."
     const identifier = item.access_token || item.slug
-    return `${origin}/${identifier}?key=${apiKey || ''}&raw=true`
+    return `${origin}/${identifier}?key=${apiKey}&raw=true`
   }
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
-    toast.success("Kopyalandı!")
+    toast.success("Copied to clipboard!")
   }
 
   const fetchLiveCode = async (service: any) => {
     setSelectedService(service)
     setIsFetching(true)
     setLiveCode(null)
-    
+
     try {
       const identifier = service.access_token || service.slug
       const url = `/${identifier}?key=${apiKey}`
       const res = await fetch(url)
       const result = await res.json()
-      
       if (!res.ok) throw new Error(result.error || result.details || "Request failed")
       setLiveCode(result)
     } catch (err: any) {
-      console.error("Live code error:", err)
-      toast.error("Kod alınamadı: " + err.message)
+      toast.error("Failed to fetch code: " + err.message)
       setSelectedService(null)
     } finally {
       setIsFetching(false)
@@ -81,6 +86,8 @@ export function DataTable({ data, apiKey }: { data: any[], apiKey: string | unde
   }
 
   const rotateUrl = async (service: any) => {
+    if (!confirm("Rotate the private URL? The old URL will stop working immediately.")) return
+
     const newToken = Array.from(crypto.getRandomValues(new Uint8Array(12)))
       .map(b => b.toString(16).padStart(2, '0'))
       .join('')
@@ -93,14 +100,14 @@ export function DataTable({ data, apiKey }: { data: any[], apiKey: string | unde
       })
       if (!res.ok) throw new Error('Rotation failed')
       toast.success("URL rotated successfully!")
-      window.location.reload()
+      router.refresh()
     } catch (e: any) {
       toast.error("Rotation failed: " + e.message)
     }
   }
 
   const resetUrl = async (service: any) => {
-    if (!confirm("Are you sure? This will make the URL public again using the slug.")) return
+    if (!confirm("Reset to public URL? This will use the slug and remove the private token.")) return
 
     try {
       const res = await fetch(`/api/services/${service.id}`, {
@@ -110,22 +117,22 @@ export function DataTable({ data, apiKey }: { data: any[], apiKey: string | unde
       })
       if (!res.ok) throw new Error('Reset failed')
       toast.success("URL reset to standard slug")
-      window.location.reload()
+      router.refresh()
     } catch (e: any) {
       toast.error("Reset failed: " + e.message)
     }
   }
 
   const deleteService = async (id: string, name: string) => {
-    if (!confirm(`${name} servisini silmek istediğine emin misin?`)) return
+    if (!confirm(`Delete "${name}"? This action cannot be undone.`)) return
 
     try {
       const res = await fetch(`/api/services/${id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('Delete failed')
-      toast.success(`${name} başarıyla silindi.`)
-      window.location.reload()
+      toast.success(`"${name}" deleted.`)
+      router.refresh()
     } catch (err: any) {
-      toast.error("Silme işlemi başarısız: " + err.message)
+      toast.error("Delete failed: " + err.message)
     }
   }
 
@@ -166,12 +173,12 @@ export function DataTable({ data, apiKey }: { data: any[], apiKey: string | unde
                       <code className="text-[10px] font-mono bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 flex-1 whitespace-nowrap">
                         {getWebhookUrl(item)}
                       </code>
-                      <Button 
-                        variant="outline" 
-                        size="icon" 
-                        className="h-8 w-8 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" 
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
                         onClick={() => copyToClipboard(getWebhookUrl(item))}
-                        disabled={!origin}
+                        disabled={!origin || !apiKey}
                       >
                         <IconCopy size={12} className="text-blue-600" />
                       </Button>
@@ -229,7 +236,7 @@ export function DataTable({ data, apiKey }: { data: any[], apiKey: string | unde
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           className="text-red-600 focus:bg-red-50 focus:text-red-600"
                           onClick={() => deleteService(item.id, item.name)}
                         >
@@ -246,7 +253,7 @@ export function DataTable({ data, apiKey }: { data: any[], apiKey: string | unde
                 <TableCell colSpan={6} className="h-32 text-center">
                   <div className="flex flex-col items-center justify-center text-muted-foreground gap-2">
                     <IconKey size={32} stroke={1} />
-                    <p>Henüz servis eklenmemiş.</p>
+                    <p>No services added yet.</p>
                   </div>
                 </TableCell>
               </TableRow>
@@ -261,10 +268,9 @@ export function DataTable({ data, apiKey }: { data: any[], apiKey: string | unde
           <DialogHeader>
             <DialogTitle className="text-xl">{selectedService?.name} Security Code</DialogTitle>
             <DialogDescription>
-              Bu kod her {selectedService?.step || 30} saniyede bir değişir.
+              This code changes every {selectedService?.step || 30} seconds.
             </DialogDescription>
           </DialogHeader>
-          
           <div className="py-8 flex flex-col items-center justify-center space-y-6">
             {isFetching ? (
               <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
@@ -279,17 +285,17 @@ export function DataTable({ data, apiKey }: { data: any[], apiKey: string | unde
                     <span>{liveCode.seconds_remaining}s</span>
                   </div>
                   <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                    <div 
-                      className="bg-blue-600 h-full transition-all duration-1000 ease-linear shadow-[0_0_8px_rgba(37,99,235,0.5)]" 
+                    <div
+                      className="bg-blue-600 h-full transition-all duration-1000 ease-linear shadow-[0_0_8px_rgba(37,99,235,0.5)]"
                       style={{ width: `${(liveCode.seconds_remaining / (selectedService?.step || 30)) * 100}%` }}
                     />
                   </div>
                 </div>
-                <Button 
-                  className="w-full bg-blue-600 hover:bg-blue-700 h-11 text-base font-semibold" 
+                <Button
+                  className="w-full bg-blue-600 hover:bg-blue-700 h-11 text-base font-semibold"
                   onClick={() => {
                     navigator.clipboard.writeText(liveCode.token)
-                    toast.success("Kod panoya kopyalandı!")
+                    toast.success("Code copied to clipboard!")
                   }}
                 >
                   Copy to Clipboard
@@ -301,10 +307,10 @@ export function DataTable({ data, apiKey }: { data: any[], apiKey: string | unde
       </Dialog>
 
       {/* Edit Dialog */}
-      <EditServiceDialog 
-        service={editingService} 
-        open={!!editingService} 
-        onOpenChange={(open) => !open && setEditingService(null)} 
+      <EditServiceDialog
+        service={editingService}
+        open={!!editingService}
+        onOpenChange={(open) => !open && setEditingService(null)}
       />
     </div>
   )

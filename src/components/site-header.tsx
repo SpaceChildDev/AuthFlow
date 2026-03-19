@@ -23,11 +23,7 @@ export function SiteHeader() {
         <h1 className="text-base font-semibold">
           {capitalizedPageName === 'Dashboard' ? 'Overview' : capitalizedPageName}
         </h1>
-        <div className="ml-auto flex items-center gap-2">
-          <Button variant="outline" size="sm" className="hidden sm:flex">
-            Documentation
-          </Button>
-        </div>
+        <div className="ml-auto flex items-center gap-2" />
       </div>
     </header>
   )

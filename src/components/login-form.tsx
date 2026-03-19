@@ -85,9 +85,9 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
                   {!isSignUp && (
-                    <a href="#" className="ml-auto text-sm underline-offset-4 hover:underline">
-                      Forgot your password?
-                    </a>
+                    <span className="ml-auto text-sm text-muted-foreground">
+                      Forgot your password? Contact admin.
+                    </span>
                   )}
                 </div>
                 <Input

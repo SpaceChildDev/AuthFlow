@@ -38,7 +38,7 @@ export default async function Page() {
               <AddServiceDialog />
             </div>
             <div className="w-full">
-              <DataTable data={services as any[]} apiKey={process.env.API_KEY} />
+              <DataTable data={services as any[]} />
             </div>
           </div>
         </div>
