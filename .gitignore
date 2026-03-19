@@ -46,8 +46,8 @@ credentials.md
 
 # AI assistant guidance & clipboard files (local only)
 .gemini-clipboard/
-GEMINI*.md
-CLAUDE*.md
+GEMINI_*.md
+CLAUDE_*.md
 *_BRIEF.md
 *_PROMPT.md
 MIGRATION_*.md

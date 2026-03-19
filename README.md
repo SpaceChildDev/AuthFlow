@@ -1,6 +1,6 @@
 # AuthFlow
 
-A self-hosted TOTP management platform built with **Next.js**, **Auth.js v5**, and **PostgreSQL**.
+A self-hosted TOTP management platform built with **Next.js 16**, **Auth.js v5**, and **PostgreSQL**.
 
 ## Features
 
@@ -43,11 +43,19 @@ See **Settings → Slack Integration** in the dashboard for setup instructions.
 
 ## Tech Stack
 
-- **Framework:** Next.js 16 (App Router)
-- **Auth:** Auth.js v5
-- **Database:** PostgreSQL (`postgres` driver)
-- **OTP:** Web Crypto API (RFC 6238)
-- **UI:** shadcn/ui + Tailwind CSS
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16.2 (App Router) |
+| Auth | Auth.js v5 |
+| Database | PostgreSQL (`postgres` driver) |
+| OTP | Web Crypto API (RFC 6238) |
+| UI | shadcn/ui + Tailwind CSS 4 |
+
+## Deployment
+
+Designed for **Vercel** with a **Supabase** (or any PostgreSQL) database.
+
+Required environment variables: `DATABASE_URL`, `AUTH_SECRET`, `API_KEY`
 
 ## Roadmap
 
