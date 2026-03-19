@@ -40,8 +40,22 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env*.local
+# --- NEVER PUSH THESE ---
+# Credentials & secrets
 credentials.md
+
+# AI assistant guidance & clipboard files (local only)
+.gemini-clipboard/
+GEMINI*.md
+CLAUDE*.md
+*_BRIEF.md
+*_PROMPT.md
+MIGRATION_*.md
 setup-db.js
 test-db.js
-GEMINI_PROMPT.md
-MIGRATION_NEON_AUTHJS.md
+
+# Cloudflare / Dokploy / platform-specific (not for this stack)
+wrangler.toml
+.npmrc
+.dockerignore
+Dockerfile
