@@ -40,3 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env*.local
+credentials.md
+setup-db.js
+test-db.js
+GEMINI_PROMPT.md
+MIGRATION_NEON_AUTHJS.md
