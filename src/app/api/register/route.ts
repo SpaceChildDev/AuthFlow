@@ -10,7 +10,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email and password required' }, { status: 400 })
     }
 
-    // Check if table exists indirectly or just catch the error
     const existing = await sql`SELECT id FROM users WHERE email = ${email} LIMIT 1`
     if (existing.length > 0) {
       return NextResponse.json({ error: 'Email already registered' }, { status: 409 })
@@ -22,9 +21,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true })
   } catch (error: any) {
     console.error('Registration error:', error)
+    // Return the specific error message to help debugging
     return NextResponse.json({ 
-      error: 'Registration failed', 
-      details: error.message 
+      error: error.message || 'Registration failed'
     }, { status: 500 })
   }
 }
