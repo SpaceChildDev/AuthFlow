@@ -7,8 +7,7 @@ import {
   IconNotification,
   IconUserCircle,
 } from "@tabler/icons-react"
-import { useRouter } from "next/navigation"
-import { createClient } from "@/lib/supabase"
+import { signOut } from "next-auth/react"
 
 import {
   Avatar,
@@ -36,21 +35,20 @@ export function NavUser({
   user,
 }: {
   user: {
-    name: string
+    name?: string | null
     email: string
-    avatar: string
+    avatar?: string | null
   }
 }) {
   const { isMobile } = useSidebar()
-  const router = useRouter()
-  const supabase = createClient()
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
+    await signOut({ callbackUrl: '/login' })
     toast.success("Logged out")
-    router.push("/login")
-    router.refresh()
   }
+
+  const name = user.name || user.email.split('@')[0]
+  const avatar = user.avatar || ""
 
   return (
     <SidebarMenu>
@@ -62,13 +60,13 @@ export function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarImage src={avatar} alt={name} />
                 <AvatarFallback className="rounded-lg">
                   {user.email.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name || 'User'}</span>
+                <span className="truncate font-medium">{name}</span>
                 <span className="text-muted-foreground truncate text-xs">
                   {user.email}
                 </span>
@@ -85,13 +83,13 @@ export function NavUser({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarImage src={avatar} alt={name} />
                   <AvatarFallback className="rounded-lg">
                     {user.email.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name || 'User'}</span>
+                  <span className="truncate font-medium">{name}</span>
                   <span className="text-muted-foreground truncate text-xs">
                     {user.email}
                   </span>

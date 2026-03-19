@@ -21,7 +21,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Loader2, Save, Sparkles, ChevronDown, ChevronUp, Lock, RefreshCw, Globe } from "lucide-react"
-import { createClient } from "@/lib/supabase"
 import { toast } from "sonner"
 import { parseOtpAuthUri } from "@/lib/totp"
 
@@ -49,7 +48,6 @@ export function EditServiceDialog({
   })
   
   const router = useRouter()
-  const supabase = createClient()
 
   const generateRandomToken = () => {
     return Array.from(crypto.getRandomValues(new Uint8Array(12)))
@@ -99,9 +97,10 @@ export function EditServiceDialog({
         ? (formData.access_token || generateRandomToken()) 
         : null
 
-      const { error } = await supabase
-        .from("otp_services")
-        .update({
+      const res = await fetch(`/api/services/${service.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           name: formData.name,
           slug: formData.slug.toLowerCase().replace(/\s+/g, "-"),
           secret: formData.secret,
@@ -111,13 +110,17 @@ export function EditServiceDialog({
           algorithm: formData.algorithm,
           access_token: finalToken
         })
-        .eq("id", service.id)
+      })
 
-      if (error) throw error
+      if (!res.ok) {
+        const { error } = await res.json()
+        throw new Error(error || 'Update failed')
+      }
 
       toast.success("Service updated successfully!")
       onOpenChange(false)
       router.refresh()
+      window.location.reload()
     } catch (error: any) {
       toast.error(error.message)
     } finally {

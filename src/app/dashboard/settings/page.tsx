@@ -1,43 +1,26 @@
-"use client"
-
-import { useState, useEffect } from "react"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
 import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar"
-import { createClient } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { User, Shield, Sun, Eye, EyeOff } from "lucide-react";
-import { toast } from "sonner";
+import { auth } from '@/lib/auth'
+import { redirect } from 'next/navigation'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { User, Shield, Sun } from "lucide-react"
 
-export default function SettingsPage() {
-  const [user, setUser] = useState<any>(null);
-  const [showKey, setShowKey] = useState(false);
-  const router = useRouter();
-  const supabase = createClient();
+export default async function SettingsPage() {
+  const session = await auth()
+  if (!session?.user) redirect('/login')
 
-  useEffect(() => {
-    async function getUser() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.push('/login');
-      } else {
-        setUser(user);
-      }
-    }
-    getUser();
-  }, []);
-
-  if (!user) return null;
+  const user = session.user
 
   return (
     <SidebarProvider
+      suppressHydrationWarning
       style={
         {
           "--sidebar-width": "calc(var(--spacing) * 60)",
@@ -68,10 +51,10 @@ export default function SettingsPage() {
               <CardContent className="space-y-4">
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email Address</Label>
-                  <Input id="email" value={user.email} disabled className="bg-slate-50 dark:bg-slate-800" />
+                  <Input id="email" value={user.email || ''} disabled className="bg-slate-50 dark:bg-slate-800" />
                 </div>
-                <Button variant="outline" size="sm" onClick={() => toast.info("Password reset email sent (Coming soon)")}>
-                  Update Password
+                <Button variant="outline" size="sm">
+                  Update Password (Coming soon)
                 </Button>
               </CardContent>
             </Card>
@@ -91,16 +74,13 @@ export default function SettingsPage() {
                   <div className="flex gap-2">
                     <Input 
                       id="apikey" 
-                      value={showKey ? "7KmN9pQrS2tUvW8xYz3aB5cDe6fGhJ4L" : "••••••••••••••••••••••••••••••"} 
+                      value="••••••••••••••••••••••••••••••" 
                       readOnly 
                       className="font-mono bg-white dark:bg-slate-950" 
                     />
-                    <Button variant="outline" size="icon" onClick={() => setShowKey(!showKey)}>
-                      {showKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </Button>
                   </div>
                   <p className="text-[11px] text-slate-500">
-                    This key grants full access to generate OTPs. Never share this in public code.
+                    Use your environment API_KEY to authenticate requests.
                   </p>
                 </div>
               </CardContent>

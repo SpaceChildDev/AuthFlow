@@ -22,7 +22,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Plus, Loader2, Sparkles, ChevronDown, ChevronUp, Lock } from "lucide-react"
-import { createClient } from "@/lib/supabase"
 import { toast } from "sonner"
 import { parseOtpAuthUri } from "@/lib/totp"
 
@@ -43,7 +42,6 @@ export function AddServiceDialog() {
   })
   
   const router = useRouter()
-  const supabase = createClient()
 
   // Generate a random string for private URLs
   const generateRandomToken = () => {
@@ -76,14 +74,12 @@ export function AddServiceDialog() {
     setIsLoading(true)
 
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error("Please login first")
-
       const accessToken = usePrivateUrl ? generateRandomToken() : null
 
-      const { error } = await supabase.from("otp_services").insert([
-        {
-          user_id: user.id,
+      const res = await fetch('/api/services', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           name: formData.name,
           slug: formData.slug || formData.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
           secret: formData.secret,
@@ -92,15 +88,19 @@ export function AddServiceDialog() {
           encoding: formData.encoding,
           algorithm: formData.algorithm,
           access_token: accessToken
-        },
-      ])
+        })
+      })
 
-      if (error) throw error
+      if (!res.ok) {
+        const { error } = await res.json()
+        throw new Error(error || 'Failed to add service')
+      }
 
       toast.success(usePrivateUrl ? "Private service created!" : "Service added successfully!")
       setOpen(false)
       resetForm()
       router.refresh()
+      window.location.reload()
     } catch (error: any) {
       toast.error(error.message)
     } finally {

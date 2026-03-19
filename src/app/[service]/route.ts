@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateTOTP } from '@/lib/totp';
-import { createClient } from '@supabase/supabase-js';
+import { sql } from '@/lib/db'
 
 export const runtime = 'edge';
 
@@ -28,20 +28,13 @@ export async function GET(
     }, { status: 401 });
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder'
-
-  const supabase = createClient(
-    supabaseUrl,
-    supabaseAnonKey
-  );
-
-  // 3. Lookup service (Standard PostgREST syntax for .or)
-  const { data: serviceData, error: dbError } = await supabase
-    .from('otp_services')
-    .select('*')
-    .or(`slug.eq.${service},access_token.eq.${service}`)
-    .maybeSingle();
+  // 3. Lookup service
+  const results = await sql`
+    SELECT * FROM otp_services
+    WHERE slug = ${service} OR access_token = ${service}
+    LIMIT 1
+  `
+  const serviceData = (results as any)[0] || null
 
   let secret = serviceData?.secret;
   let digits = serviceData?.digits || parseInt(searchParams.get('digits') || '6');
@@ -67,9 +60,10 @@ export async function GET(
     
     // Non-blocking log
     if (serviceData?.id) {
-      supabase.from('otp_logs').insert([
-        { service_id: serviceData.id, user_id: serviceData.user_id, status_code: 200 }
-      ]).then();
+      sql`
+        INSERT INTO otp_logs (service_id, user_id, status_code)
+        VALUES (${serviceData.id}, ${serviceData.user_id}, 200)
+      `.catch(e => console.error("Logging failed:", e))
     }
 
     if (raw) {

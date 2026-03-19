@@ -50,7 +50,7 @@ export default function LandingPage() {
               <Server className="h-6 w-6" />
             </div>
             <h3 className="text-lg font-bold mb-2">Secure Storage</h3>
-            <p className="text-slate-500 text-sm">Encrypted secrets managed via Supabase and Cloudflare KV for maximum security.</p>
+            <p className="text-slate-500 text-sm">Encrypted secrets managed via Neon and Auth.js for maximum security.</p>
           </div>
           <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border shadow-sm">
             <div className="bg-blue-500/10 text-blue-600 w-10 h-10 flex items-center justify-center rounded-lg mb-4">
@@ -64,7 +64,7 @@ export default function LandingPage() {
               <Globe className="h-6 w-6" />
             </div>
             <h3 className="text-lg font-bold mb-2">Edge Performance</h3>
-            <p className="text-slate-500 text-sm">Powered by Next.js and Cloudflare for sub-millisecond response times globally.</p>
+            <p className="text-slate-500 text-sm">Powered by Next.js for sub-millisecond response times globally.</p>
           </div>
         </div>
       </main>

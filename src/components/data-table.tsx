@@ -4,11 +4,10 @@ import * as React from "react"
 import {
   IconDotsVertical,
   IconKey,
-  IconExternalLink,
-  IconRefresh,
   IconCopy,
   IconEdit,
   IconTrash,
+  IconRefresh,
 } from "@tabler/icons-react"
 import {
   Table,
@@ -18,7 +17,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -36,7 +34,6 @@ import {
 } from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { Loader2, Lock, Globe, Clock, Fingerprint } from "lucide-react"
-import { createClient } from "@/lib/supabase"
 import { EditServiceDialog } from "./edit-service-dialog"
 
 export function DataTable({ data, apiKey }: { data: any[], apiKey: string | undefined }) {
@@ -89,17 +86,16 @@ export function DataTable({ data, apiKey }: { data: any[], apiKey: string | unde
       .join('')
 
     try {
-      const supabase = createClient()
-      const { error } = await supabase
-        .from('otp_services')
-        .update({ access_token: newToken })
-        .eq('id', service.id)
-
-      if (error) throw error
+      const res = await fetch(`/api/services/${service.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...service, access_token: newToken })
+      })
+      if (!res.ok) throw new Error('Rotation failed')
       toast.success("URL rotated successfully!")
       window.location.reload()
     } catch (e: any) {
-      toast.error("Rotation failed: " + (e.message || "Permissions error"))
+      toast.error("Rotation failed: " + e.message)
     }
   }
 
@@ -107,17 +103,16 @@ export function DataTable({ data, apiKey }: { data: any[], apiKey: string | unde
     if (!confirm("Are you sure? This will make the URL public again using the slug.")) return
 
     try {
-      const supabase = createClient()
-      const { error } = await supabase
-        .from('otp_services')
-        .update({ access_token: null })
-        .eq('id', service.id)
-
-      if (error) throw error
+      const res = await fetch(`/api/services/${service.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...service, access_token: null })
+      })
+      if (!res.ok) throw new Error('Reset failed')
       toast.success("URL reset to standard slug")
       window.location.reload()
     } catch (e: any) {
-      toast.error("Reset failed: " + (e.message || "Permissions error"))
+      toast.error("Reset failed: " + e.message)
     }
   }
 
@@ -125,14 +120,8 @@ export function DataTable({ data, apiKey }: { data: any[], apiKey: string | unde
     if (!confirm(`${name} servisini silmek istediğine emin misin?`)) return
 
     try {
-      const supabase = createClient()
-      const { error } = await supabase
-        .from('otp_services')
-        .delete()
-        .eq('id', id)
-
-      if (error) throw error
-
+      const res = await fetch(`/api/services/${id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Delete failed')
       toast.success(`${name} başarıyla silindi.`)
       window.location.reload()
     } catch (err: any) {
