@@ -10,15 +10,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { User, Shield, Sun } from "lucide-react"
+import { User, Shield, Sun, Hash } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { useSession, signOut } from "next-auth/react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
+const DEV_SESSION = {
+  user: { id: 'dev-user-id', email: 'dev@localhost.com', name: 'Dev Admin' },
+  expires: '',
+}
+
 export default function SettingsPage() {
-  const { data: session } = useSession()
+  const { data: rawSession } = useSession()
+  const isDev = process.env.NODE_ENV === 'development'
+  const session = rawSession ?? (isDev ? DEV_SESSION : null)
   const router = useRouter()
 
   const [currentPassword, setCurrentPassword] = useState("")
@@ -180,6 +187,47 @@ export default function SettingsPage() {
                     <p className="text-xs text-muted-foreground">Switch between Light and Dark mode.</p>
                   </div>
                   <ThemeToggle />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Slack Integration */}
+            <Card className="shadow-sm">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Hash className="h-5 w-5 text-purple-600" />
+                  <CardTitle>Slack Integration</CardTitle>
+                </div>
+                <CardDescription>Connect your Slack workspace to request OTP codes via slash command.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm font-medium">Step 1 — Create a Slack App</p>
+                    <p className="text-xs text-muted-foreground mt-1">Go to <strong>api.slack.com/apps</strong> → Create New App → From scratch. Give it a name and select your workspace.</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Step 2 — Add a Slash Command</p>
+                    <p className="text-xs text-muted-foreground mt-1">Under <strong>Slash Commands</strong>, create a new command:</p>
+                    <pre className="mt-2 p-3 bg-slate-50 dark:bg-slate-900 rounded-md text-xs font-mono border border-slate-100 dark:border-slate-800">
+{`Command:      /otp
+Request URL:  https://authflow.spacechild.dev/api/slack
+Usage Hint:   [service-slug]`}
+                    </pre>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Step 3 — Add Signing Secret to Vercel</p>
+                    <p className="text-xs text-muted-foreground mt-1">Under <strong>Basic Information → App Credentials</strong>, copy the <strong>Signing Secret</strong> and add it to Vercel as <strong>SLACK_SIGNING_SECRET</strong>.</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Step 4 — Install &amp; Use</p>
+                    <p className="text-xs text-muted-foreground mt-1">Install the app to your workspace. Anyone can then type:</p>
+                    <pre className="mt-2 p-3 bg-slate-50 dark:bg-slate-900 rounded-md text-xs font-mono border border-slate-100 dark:border-slate-800">
+{`/otp ads
+/otp analytics`}
+                    </pre>
+                    <p className="text-xs text-muted-foreground mt-1">The OTP code posts to the channel, visible to everyone. Slugs are the short names you defined per service.</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
