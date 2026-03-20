@@ -7,6 +7,10 @@ A self-hosted TOTP management platform. Generate, manage, and audit one-time pas
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-compatible-blue?logo=postgresql)](https://www.postgresql.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
+**[Live Demo →](https://demo.authflow.spacechild.dev)** &nbsp;|&nbsp; **[Production](https://authflow.spacechild.dev)**
+
+> Demo login: `demo@authflow.dev` / `demo` — no data is stored, write actions are disabled.
+
 ## Features
 
 | Feature | Description |
@@ -155,4 +159,4 @@ MIT — see [LICENSE](LICENSE).
 
 ---
 
-Developed by [daiquiridev](https://github.com/daiquiridev) · [Live demo](https://authflow.spacechild.dev)
+Developed by [daiquiridev](https://github.com/daiquiridev) · [Live demo](https://demo.authflow.spacechild.dev) · [Production](https://authflow.spacechild.dev)
