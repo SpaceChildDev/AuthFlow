@@ -59,8 +59,8 @@ export async function GET(
     // Non-blocking log
     if (serviceData?.id) {
       sql`
-        INSERT INTO otp_logs (service_id, user_id, status_code)
-        VALUES (${serviceData.id}, ${serviceData.user_id}, 200)
+        INSERT INTO otp_logs (service_id, user_id, status_code, source, requested_by)
+        VALUES (${serviceData.id}, ${serviceData.user_id}, 200, 'api', 'api-key')
       `.catch(e => console.error("Logging failed:", e))
     }
 

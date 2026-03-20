@@ -37,6 +37,7 @@ export async function POST(req: NextRequest) {
 
   const params = new URLSearchParams(rawBody)
   const text = (params.get('text') || '').trim().toLowerCase()
+  const slackUser = params.get('user_name') || params.get('user_id') || 'unknown'
 
   if (!text) {
     return NextResponse.json({
@@ -70,8 +71,8 @@ export async function POST(req: NextRequest) {
 
     // Non-blocking log
     sql`
-      INSERT INTO otp_logs (service_id, user_id, status_code)
-      VALUES (${service.id}, ${service.user_id}, 200)
+      INSERT INTO otp_logs (service_id, user_id, status_code, source, requested_by)
+      VALUES (${service.id}, ${service.user_id}, 200, 'slack', ${slackUser})
     `.catch((e: any) => console.error('Slack OTP log failed:', e))
 
     return NextResponse.json({
