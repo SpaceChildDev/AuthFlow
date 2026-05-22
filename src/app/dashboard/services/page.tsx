@@ -6,6 +6,7 @@ import { auth } from '@/lib/auth'
 import { sql } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import { AddServiceDialog } from '@/components/add-service-dialog'
+import { SecurityGuide } from '@/components/security-guide'
 
 export default async function Page() {
   const session = await auth()
@@ -37,6 +38,7 @@ export default async function Page() {
               </div>
               <AddServiceDialog />
             </div>
+            <SecurityGuide />
             <div className="w-full">
               <DataTable data={services as any[]} />
             </div>
